@@ -31,19 +31,22 @@ resource "aws_secretsmanager_secret_rotation" "db_rotation" {
 }
 
 resource "aws_lambda_function" "rotation_lambda" {
-  filename      = "rotation_lambda.zip"
+  s3_bucket     = var.lambda_s3_bucket
+  s3_key        = var.lambda_s3_key
   function_name = "${var.prefix}-secrets-rotation"
   role          = aws_iam_role.rotation_role.arn
   handler       = "app.main.lambda_handler"
   runtime       = "python3.11"
   timeout       = 30
   kms_key_arn   = aws_kms_key.secrets_key.arn
+
   environment {
     variables = {
       SNS_TOPIC_ARN    = aws_sns_topic.rotation_alerts.arn
       ROTATION_ENABLED = "true"
     }
   }
+
   tags = { Project = "aws-secrets-rotation-automation" }
 }
 

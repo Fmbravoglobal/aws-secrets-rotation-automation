@@ -13,3 +13,13 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+variable "lambda_s3_bucket" {
+  description = "S3 bucket containing the Lambda deployment package"
+  type        = string
+  default     = "my-lambda-deployments"
+}
+variable "lambda_s3_key" {
+  description = "S3 key for the Lambda deployment package"
+  type        = string
+  default     = "rotation_lambda.zip"
+}

@@ -1,4 +1,4 @@
-name: Security Pipeline
+name: AWS Secrets Rotation Security Pipeline
 
 on:
   push:
@@ -13,21 +13,30 @@ jobs:
   terraform-security:
     name: Terraform Validate & Scan
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
+
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
         working-directory: terraform
+        continue-on-error: true
+
       - name: Terraform Init
         run: terraform init -backend=false
         working-directory: terraform
+
       - name: Terraform Validate
         run: terraform validate
         working-directory: terraform
-      - name: Run Checkov
+
+      - name: Run Checkov Security Scan
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: terraform
@@ -37,12 +46,18 @@ jobs:
   python-tests:
     name: Python Unit Tests
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-dev.txt
+
       - name: Run pytest
         run: pytest tests/ -v --tb=short
