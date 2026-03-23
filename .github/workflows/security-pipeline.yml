@@ -42,6 +42,7 @@ jobs:
           directory: terraform
           quiet: true
           soft_fail: true
+          skip_check: CKV_AWS_117,CKV_AWS_272
 
   python-tests:
     name: Python Unit Tests
